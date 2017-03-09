@@ -1,0 +1,28 @@
+{
+  "name": "localcast",
+  "version": "0.0.0",
+  "description": "A shared event emitter that works across multiple processes on the same machine, including the browser!",
+  "main": "index.js",
+  "dependencies": {
+    "corsify": "^2.1.0",
+    "end-of-stream": "^1.1.0",
+    "websocket-stream": "^3.3.3"
+  },
+  "devDependencies": {
+    "standard": "^9.0.1"
+  },
+  "scripts": {
+    "test": "standard"
+  },
+  "browser": "./browser.js",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/mafintosh/localcast.git"
+  },
+  "author": "Mathias Buus (@mafintosh)",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/mafintosh/localcast/issues"
+  },
+  "homepage": "https://github.com/mafintosh/localcast"
+}
