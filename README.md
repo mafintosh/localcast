@@ -56,6 +56,34 @@ Create a new localcast event emitter.
 
 Optionally you can give it a name if you are running multiple and want them to avoid clashing.
 
+#### `cast.on('localcast', peer)`
+
+Whenever you are connected to another localcast instance a special `localcast` event is emitted with an object describing the other instance.
+
+``` js
+cast.on('localcast', function (peer) {
+  console.log('we are connected to another instance', peer)
+})
+```
+
+If the other peer is a browser the peer looks like this
+
+``` js
+{
+  type: 'browser',
+  localhost: urlOfWebsite
+}
+```
+
+If the other peer is a node process it looks like this
+
+``` js
+{
+  type: 'node',
+  pid: pid
+}
+```
+
 ## License
 
 MIT

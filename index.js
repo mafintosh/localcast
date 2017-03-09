@@ -41,6 +41,7 @@ function localcast (name) {
   }
 
   function onfollower (stream) {
+    stream.write(JSON.stringify({type: 'node', pid: process.pid}))
     stream.on('data', function (data) {
       data = JSON.parse(data)
       if (data.name === name) emit.apply(cast, data.args)
@@ -51,17 +52,34 @@ function localcast (name) {
   }
 
   function onleader () {
+    streams = []
     wss.createServer({server: server}, onsocket)
 
     function onsocket (stream) {
-      if (!streams) streams = [stream]
-      stream.on('data', function (data) {
-        var parsed = JSON.parse(data)
-        if (parsed.name === name) emit.apply(cast, parsed.args)
+      for (var i = 0; i < streams.length; i++) {
+        var hs = streams[i].handshake
+        if (hs) stream.write(JSON.stringify({name: name, args: ['localcast', hs]}))
+      }
+
+      stream.write(JSON.stringify({name: name, args: ['localcast', {type: 'node', pid: process.pid}]}))
+      stream.once('data', function (handshake) {
+        stream.handshake = JSON.parse(handshake)
+        emit.call(cast, 'localcast', stream.handshake)
+
         for (var i = 0; i < streams.length; i++) {
-          if (streams[i] !== stream) streams[i].write(data)
+          if (streams[i] === stream) continue
+          streams[i].write(JSON.stringify({name: name, args: ['localcast', stream.handshake]}))
         }
+
+        stream.on('data', function (data) {
+          var parsed = JSON.parse(data)
+          if (parsed.name === name) emit.apply(cast, parsed.args)
+          for (var i = 0; i < streams.length; i++) {
+            if (streams[i] !== stream) streams[i].write(data)
+          }
+        })
       })
+
       streams.push(stream)
       eos(stream, function () {
         streams.splice(streams.indexOf(stream), 1)

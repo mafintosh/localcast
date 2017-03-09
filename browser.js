@@ -37,6 +37,8 @@ function localcast (name) {
   function tryConnect () {
     var s = wss('ws://localhost:' + port)
 
+    s.write(JSON.stringify({type: 'browser', location: window.location.toString()}))
+
     s.on('connect', function (data) {
       onceConnected = true
       socket = s
