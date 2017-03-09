@@ -10,6 +10,7 @@ cast.on('hello', function (data) {
 })
 
 var id = Math.random()
+console.log('my-id', id)
 
 setInterval(function () {
   cast.emit('hello', 'world ' + id)

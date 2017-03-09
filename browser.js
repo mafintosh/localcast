@@ -31,13 +31,13 @@ function localcast (name) {
       return
     }
 
-    while (queue.length) socket.write(JSON.stringify({name: name, args: queue.shift()}))
+    while (queue.length) socket.write(JSON.stringify(queue.shift()))
   }
 
   function tryConnect () {
     var s = wss('ws://localhost:' + port)
 
-    s.write(JSON.stringify({type: 'browser', location: window.location.toString()}))
+    s.write(JSON.stringify({type: 'browser', namespace: name, location: window.location.toString()}))
 
     s.on('connect', function (data) {
       onceConnected = true
@@ -47,7 +47,7 @@ function localcast (name) {
 
     s.on('data', function (data) {
       data = JSON.parse(data.toString())
-      if (data.name === name) emit.apply(cast, data.args)
+      emit.apply(cast, data)
     })
 
     eos(s, function () {
