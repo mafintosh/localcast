@@ -36,7 +36,7 @@ function localcast (name) {
       if (!next) return
 
       for (var i = 0; i < streams.length; i++) {
-        if (isLeader && streams[i].handshake.namespace !== name) continue
+        if (isLeader && streams[i].handshake && streams[i].handshake.namespace !== name) continue
         streams[i].write(JSON.stringify(next))
       }
     }
