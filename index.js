@@ -41,19 +41,9 @@ function localcast (name) {
   }
 
   function onfollower (stream) {
-    stream.once('data', function (data) {
-      var remote = JSON.parse(data)
-
-      if (remote !== name) {
-        var err = new Error('Another localcast is running here: ' + remote + '. Pick another name')
-        emit.call(cast, 'error', err)
-        return
-      }
-
-      stream.on('data', function (data) {
-        data = JSON.parse(data)
-        if (data.name === name) emit.apply(cast, data.args)
-      })
+    stream.on('data', function (data) {
+      data = JSON.parse(data)
+      if (data.name === name) emit.apply(cast, data.args)
     })
 
     streams = [stream]
@@ -61,11 +51,10 @@ function localcast (name) {
   }
 
   function onleader () {
-    streams = []
     wss.createServer({server: server}, onsocket)
 
     function onsocket (stream) {
-      stream.write(JSON.stringify(name))
+      if (!streams) streams = [stream]
       stream.on('data', function (data) {
         var parsed = JSON.parse(data)
         if (parsed.name === name) emit.apply(cast, parsed.args)
