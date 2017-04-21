@@ -11,6 +11,7 @@ function localcast (name) {
   var port = 46356
   var cast = new events.EventEmitter()
   var emit = cast.emit
+  var isClosing = false
 
   var queue = []
   var onceConnected = false
@@ -19,6 +20,11 @@ function localcast (name) {
     queue.push(Array.prototype.slice.call(arguments))
     drain()
     return emit.apply(cast, arguments)
+  }
+
+  cast.close = function () {
+    isClosing = true
+    socket.end()
   }
 
   tryConnect()
@@ -52,6 +58,7 @@ function localcast (name) {
 
     eos(s, function () {
       socket = null
+      if (isClosing) return
       setTimeout(tryConnect, 1000)
     })
   }

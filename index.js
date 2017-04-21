@@ -12,6 +12,7 @@ function localcast (name) {
   var port = 46356
   var cast = new events.EventEmitter()
   var emit = events.EventEmitter.prototype.emit
+  var closing = false
 
   var queue = []
   var streams = null
@@ -21,6 +22,17 @@ function localcast (name) {
     queue.push(Array.prototype.slice.call(arguments))
     drain()
     return emit.apply(this, arguments)
+  }
+
+  cast.close = function () {
+    closing = true
+    cast.removeAllListeners()
+    server.close()
+    if (streams) {
+      for (var i = 0; < streams.length; i++) {
+        streams[i].end()
+      }
+    }
   }
 
   server.on('listening', onleader)
@@ -93,6 +105,7 @@ function localcast (name) {
   }
 
   function update () {
+    if (closing) return
     streams = null
     tryListen(function (err) {
       if (err) tryConnect()
